@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
+import pandas as pd
 
-# Create FastAPI app
+from pydantic import BaseModel, Field
+from datetime import datetime
+
+
 app = FastAPI()
 
-# Enable CORS
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,23 +18,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load ML model
+
+# Load model
 model = joblib.load("car_price_model.pkl")
 
-# Load encoders
-name_encoder = joblib.load("name_encoder.pkl")
 
-fuel_encoder = joblib.load("fuel_encoder.pkl")
 
-transmission_encoder = joblib.load(
-    "transmission_encoder.pkl"
-)
+# Input validation model
+class CarDetails(BaseModel):
 
-owner_encoder = joblib.load(
-    "owner_encoder.pkl"
-)
+    name: str
 
-# Home route
+    year: int = Field(
+        ...,
+        ge=1900,
+        le=datetime.now().year,
+        description="Enter valid car year"
+    )
+
+    km_driven: int = Field(
+        ...,
+        ge=0,
+        description="KM driven cannot be negative"
+    )
+
+    fuel: str
+
+    transmission: str
+
+    owner: str
+
+
+
 @app.get("/")
 def home():
 
@@ -38,42 +57,29 @@ def home():
         "message": "Used Car Price Predictor API"
     }
 
-# Prediction route
-@app.get("/predict")
-def predict(
-    name: str,
-    year: int,
-    km_driven: int,
-    fuel: str,
-    transmission: str,
-    owner: str
-):
 
-    # Encode inputs
-    name = name_encoder.transform([name])[0]
 
-    fuel = fuel_encoder.transform([fuel])[0]
+@app.post("/predict")
+def predict(car: CarDetails):
 
-    transmission = transmission_encoder.transform(
-        [transmission]
-    )[0]
 
-    owner = owner_encoder.transform([owner])[0]
+    input_data = pd.DataFrame(
+        [{
+            "name": car.name,
+            "year": car.year,
+            "km_driven": car.km_driven,
+            "fuel": car.fuel,
+            "transmission": car.transmission,
+            "owner": car.owner
+        }]
+    )
 
-    # Predict price
-    prediction = model.predict([[
-        name,
-        year,
-        km_driven,
-        fuel,
-        transmission,
-        owner
-    ]])
 
-    # Return result
+    prediction = model.predict(input_data)
+
+
     return {
-        "predicted_price": round(
-            prediction[0],
-            2
-        )
+
+        "predicted_price": f"₹ {prediction[0]:,.0f}"
+
     }
