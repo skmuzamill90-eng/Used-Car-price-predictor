@@ -49,3 +49,69 @@ button:hover{
     text-align: left;
     font-size: 20px;
 }
+
+/* Splash Screen */
+
+#splash-screen{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#ffffff;
+
+    z-index:9999;
+
+}
+
+#logo{
+
+    width:220px;
+
+    animation:zoom 1.5s ease;
+
+}
+
+#splash-screen h1{
+
+    margin-top:20px;
+
+    font-size:36px;
+
+    color:#1f2937;
+
+    font-family:Arial, sans-serif;
+
+}
+
+@keyframes zoom{
+
+    from{
+
+        transform:scale(0);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}

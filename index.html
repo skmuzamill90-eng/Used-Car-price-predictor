@@ -2,32 +2,52 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
     <title>Car Price Predictor</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-    <div class="container">
+    <!-- Splash Screen -->
+
+    <div id="splash-screen">
+
+        <img src="logo2.jpg"
+             alt="Logo"
+             id="logo">
+
+        <h1>Car Price Predictor</h1>
+
+    </div>
+
+    <!-- Main Website -->
+
+    <div class="container"
+         id="main-content">
 
         <h1>Used Car Price Predictor</h1>
 
         <form id="carForm">
 
-            <input type="text"
-                   id="name"
-                   placeholder="Car Name">
+            <input
+                type="text"
+                id="name"
+                placeholder="Car Name">
 
             <br><br>
 
-            <input type="number"
-                   id="year"
-                   placeholder="Year">
+            <input
+                type="number"
+                id="year"
+                placeholder="Year">
 
             <br><br>
 
@@ -59,9 +79,10 @@
 
             <br><br>
 
-            <input type="number"
-                   id="kms"
-                   placeholder="Kilometers Driven">
+            <input
+                type="number"
+                id="kms"
+                placeholder="Kilometers Driven">
 
             <br><br>
 
@@ -86,4 +107,5 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>
