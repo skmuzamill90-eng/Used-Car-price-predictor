@@ -7,8 +7,16 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
+# ==========================
+# Create FastAPI App
+# ==========================
+
 app = FastAPI()
 
+
+# ==========================
+# Enable CORS
+# ==========================
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,12 +27,46 @@ app.add_middleware(
 )
 
 
-# Load model
+# ==========================
+# Load Trained Model
+# ==========================
+
 model = joblib.load("car_price_model.pkl")
 
 
+# ==========================
+# Indian Currency Formatter
+# ==========================
 
-# Input validation model
+def format_indian_currency(number):
+
+    number = int(round(number))
+
+    s = str(number)
+
+    if len(s) <= 3:
+        return s
+
+    last_three = s[-3:]
+    remaining = s[:-3]
+
+    result = ""
+
+    while len(remaining) > 2:
+
+        result = "," + remaining[-2:] + result
+
+        remaining = remaining[:-2]
+
+    result = remaining + result
+
+    return result + "," + last_three
+
+
+# ==========================
+# Input Validation
+# ==========================
+
 class CarDetails(BaseModel):
 
     name: str
@@ -39,7 +81,7 @@ class CarDetails(BaseModel):
     km_driven: int = Field(
         ...,
         ge=0,
-        description="KM driven cannot be negative"
+        description="KM Driven cannot be negative"
     )
 
     fuel: str
@@ -49,6 +91,9 @@ class CarDetails(BaseModel):
     owner: str
 
 
+# ==========================
+# Home API
+# ==========================
 
 @app.get("/")
 def home():
@@ -58,10 +103,12 @@ def home():
     }
 
 
+# ==========================
+# Prediction API
+# ==========================
 
 @app.post("/predict")
 def predict(car: CarDetails):
-
 
     input_data = pd.DataFrame(
         [{
@@ -74,12 +121,18 @@ def predict(car: CarDetails):
         }]
     )
 
-
+    # Predict Price
     prediction = model.predict(input_data)
 
+    predicted_price = prediction[0]
+
+    # Calculate ±10% Range
+    lower_price = predicted_price * 0.90
+    upper_price = predicted_price * 1.10
 
     return {
 
-        "predicted_price": f"₹ {prediction[0]:,.0f}"
+        "predicted_price":
+        f"₹ {format_indian_currency(lower_price)} - ₹ {format_indian_currency(upper_price)}"
 
     }

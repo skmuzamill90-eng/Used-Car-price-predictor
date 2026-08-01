@@ -2,10 +2,8 @@
 
 window.onload = function () {
 
-    // Hide main content initially
     document.getElementById("main-content").style.display = "none";
 
-    // Show splash screen for 3 seconds
     setTimeout(function () {
 
         document.getElementById("splash-screen").style.display = "none";
@@ -15,7 +13,6 @@ window.onload = function () {
     }, 3000);
 
 };
-
 
 
 // Prediction
@@ -43,7 +40,6 @@ document.getElementById("carForm")
     let kms =
     document.getElementById("kms").value;
 
-
     try{
 
         let response = await fetch(
@@ -53,23 +49,16 @@ document.getElementById("carForm")
                 method: "POST",
 
                 headers: {
-
                     "Content-Type": "application/json"
-
                 },
 
                 body: JSON.stringify({
 
                     name: name,
-
                     year: Number(year),
-
                     km_driven: Number(kms),
-
                     fuel: fuel,
-
                     transmission: transmission,
-
                     owner: owner
 
                 })
@@ -77,36 +66,31 @@ document.getElementById("carForm")
             }
         );
 
-
         let data = await response.json();
 
         console.log(data);
 
-
         if(response.ok){
 
-            document.getElementById("result").innerHTML =
-
-                "Predicted Price: " + data.predicted_price;
+            document.getElementById("result").innerHTML = `
+                <h3>Estimated Price Range</h3>
+                <h2>${data.predicted_price}</h2>
+            `;
 
         }
-
         else{
 
             document.getElementById("result").innerHTML =
-
                 "Please enter valid car details.";
 
         }
 
     }
-
     catch(error){
 
         console.log(error);
 
         document.getElementById("result").innerHTML =
-
             "Unable to connect to the server.";
 
     }

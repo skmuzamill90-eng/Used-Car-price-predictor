@@ -1,12 +1,14 @@
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
 from sklearn.pipeline import Pipeline
+
+from sklearn.metrics import r2_score, mean_absolute_error
 
 import joblib
 
@@ -21,13 +23,12 @@ df = pd.read_csv(
 
 
 # ==========================
-# Separate Features and Target
+# Features and Target
 # ==========================
 
 X = df.drop("selling_price", axis=1)
 
 y = df["selling_price"]
-
 
 
 # ==========================
@@ -40,7 +41,6 @@ categorical_columns = [
     "transmission",
     "owner"
 ]
-
 
 
 # ==========================
@@ -59,9 +59,8 @@ preprocessor = ColumnTransformer(
 )
 
 
-
 # ==========================
-# Create ML Pipeline
+# Machine Learning Pipeline
 # ==========================
 
 model = Pipeline(
@@ -73,11 +72,13 @@ model = Pipeline(
 
         (
             "regressor",
-            LinearRegression()
+            RandomForestRegressor(
+                n_estimators=300,
+                random_state=42
+            )
         )
     ]
 )
-
 
 
 # ==========================
@@ -92,7 +93,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-
 # ==========================
 # Train Model
 # ==========================
@@ -103,18 +103,29 @@ model.fit(
 )
 
 
+# ==========================
+# Predictions
+# ==========================
+
+predictions = model.predict(X_test)
+
 
 # ==========================
-# Check Accuracy
+# Evaluation
 # ==========================
 
-score = model.score(
-    X_test,
-    y_test
+r2 = r2_score(
+    y_test,
+    predictions
 )
 
-print("Model Accuracy:", score)
+mae = mean_absolute_error(
+    y_test,
+    predictions
+)
 
+print("R² Score :", round(r2, 3))
+print("MAE       :", round(mae, 2))
 
 
 # ==========================
@@ -126,5 +137,4 @@ joblib.dump(
     "car_price_model.pkl"
 )
 
-
-print("Model trained and saved successfully")
+print("Random Forest model trained successfully")
